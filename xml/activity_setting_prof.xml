@@ -19,7 +19,7 @@
             android:background="#00BCD4">
 
             <TextView
-                android:id="@+id/textview_stdinfo"
+                android:id="@+id/textview_profinfo"
                 android:layout_marginTop="3dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
