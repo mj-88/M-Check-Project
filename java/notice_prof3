@@ -1,0 +1,131 @@
+package com.example.mcheck;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+//교수 공지 글 작성
+public class notice_prof3 extends AppCompatActivity {
+
+    final private String TAG = getClass().getSimpleName();//로그에 사용할 TAG변수 선언
+
+    EditText edtext_title, edtext_content;
+    Button btn_regcontent;
+
+    String userid = "";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_notice_prof3);
+
+        userid = getIntent().getStringExtra("userid");
+
+        edtext_title = findViewById(R.id.edtext_title);
+        edtext_content = findViewById(R.id.edtext_content);
+        btn_regcontent = findViewById(R.id.btn_regcontent);
+        btn_regcontent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //게시물 등록 함수
+                RegBoard regBoard = new RegBoard();
+                regBoard.execute(userid, edtext_title.getText().toString(), edtext_content.getText().toString());
+            }
+        });
+    }
+
+    class RegBoard extends AsyncTask<String, Void, String>{
+        @Override
+        protected void onPreExecute(){
+            super.onPreExecute();
+            Log.d(TAG, "onPreExecute");
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            super.onPostExecute(result);
+            Log.d(TAG, "onPostExecute" + result);
+
+            if(result.equals("success")){
+                Toast.makeText(notice_prof3.this, "등록 완료", Toast.LENGTH_SHORT).show();
+                finish();
+            }else{
+                Toast.makeText(notice_prof3.this, result, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params){
+            String userid = params[0];
+            String title = params[1];
+            String content = params[2];
+
+            String server_url = "https://chlwogh0829.cafe24.com/";
+
+            URL url;
+            String response = "";
+
+            try {
+                url = new URL(server_url);
+
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(15000);
+                connection.setRequestMethod("POST");
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                Uri.Builder builder = new Uri.Builder().appendQueryParameter("userid", "");
+                String query = builder.build().getEncodedQuery();
+
+                OutputStream os = connection.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+
+                if (responsecode == HttpURLConnection.HTTP_OK){
+                    String line;
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    while ((line = bufferedReader.readLine()) != null){
+                        response += line;
+                    }
+                }else {
+                    response = "";
+                }
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return response;
+        }
+    }
+}
