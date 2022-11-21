@@ -1,0 +1,150 @@
+package com.example.mcheck;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+
+//교수 공지 글 상세
+public class notice_prof4 extends AppCompatActivity {
+
+    final private String TAG = getClass().getSimpleName();
+
+    TextView title_tv, content_tv, date_tv;
+
+    String board_seq;//선택 게시물 번호
+
+    String userid = "";//유저 아이디
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_notice_prof4);
+
+        board_seq = getIntent().getStringExtra("board_seq");
+        userid = getIntent().getStringExtra("userid");
+
+        title_tv = findViewById(R.id.title_tv);
+        content_tv = findViewById(R.id.content_tv);
+        date_tv = findViewById(R.id.date_tv);
+
+        InitData();
+    }
+
+    private void InitData(){
+        LoadBoard loadBoard = new LoadBoard();
+        loadBoard.execute(board_seq);
+    }
+
+    class LoadBoard extends AsyncTask<String, Void, String>{
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.d(TAG, "onPreExecute");
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            Log.d(TAG, "onPostExecute, " + result);
+            try {
+                // 결과값이 JSONArray 형태로 넘어오기 때문에
+                // JSONArray, JSONObject 를 사용해서 파싱
+                JSONArray jsonArray = null;
+                jsonArray = new JSONArray(result);
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    // Database 의 데이터들을 변수로 저장한 후 해당 TextView 에 데이터 입력
+                    String title = jsonObject.optString("title");
+                    String content = jsonObject.optString("content");
+                    String crt_dt = jsonObject.optString("crt_dt");
+
+                    title_tv.setText(title);
+                    content_tv.setText(content);
+                    date_tv.setText(crt_dt);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        @Override
+        protected String doInBackground(String... params){
+            String userid = params[0];
+            String title = params[1];
+            String content = params[2];
+
+            String server_url = "https://chlwogh0829.cafe24.com/";
+
+            URL url;
+            String response = "";
+
+            try {
+                url = new URL(server_url);
+
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(15000);
+                connection.setRequestMethod("POST");
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                Uri.Builder builder = new Uri.Builder().appendQueryParameter("userid", "");
+                String query = builder.build().getEncodedQuery();
+
+                OutputStream os = connection.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+
+                if (responsecode == HttpURLConnection.HTTP_OK){
+                    String line;
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    while ((line = bufferedReader.readLine()) != null){
+                        response += line;
+                    }
+                }else {
+                    response = "";
+                }
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return response;
+        }
+    }
+}
