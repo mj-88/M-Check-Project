@@ -1,0 +1,193 @@
+package com.example.mcheck;
+
+import static android.content.ContentValues.TAG;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.nfc.Tag;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+//교수 공지사항2(글 목록)
+public class notice_prof2 extends AppCompatActivity {
+
+    private TextView textview_time;
+
+    ListView listView;
+    ImageButton btn_reg;
+    String userid = "";
+
+    ArrayList<String> titleList = new ArrayList<>();//리스트뷰에 사용할 제목 배열
+
+    ArrayList<String> seqList = new ArrayList<>();//게시물 번호를 담기 위한 배열
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_notice_prof2);
+
+        textview_time = (TextView) findViewById(R.id.textview_time);
+        textview_time.setText(getTime());//시계
+
+        userid = getIntent().getStringExtra("userid"); //유저 아이디 값 받기
+
+        listView = findViewById(R.id.listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(notice_prof2.this, notice_prof4.class);
+                intent.putExtra("board_seq", seqList.get(i));
+                intent.putExtra("userid", userid);
+                startActivity(intent);
+            }
+        });
+
+        btn_reg = findViewById(R.id.btn_reg);
+        btn_reg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(notice_prof2.this, notice_prof3.class);
+                intent.putExtra("userid", userid);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    private String getTime(){//시간 표시
+        SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN);
+        mFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+        Date mDate = new Date();
+        String getTime = mFormat.format(mDate);
+        return getTime;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GetBoard getBoard = new GetBoard();
+        getBoard.execute();
+    }
+
+    class GetBoard extends AsyncTask<String, Void, String>{
+
+        @Override
+        protected void onPreExecute(){
+            super.onPreExecute();
+            Log.d(TAG, "onPreExecute");
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            super.onPostExecute(result);
+            Log.d(TAG, "onPostExecute" + result);
+
+            titleList.clear();
+            seqList.clear();
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+
+                for(int i = 0; i < jsonArray.length(); i++){
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    String title = jsonObject.optString("title");
+                    String seq = jsonObject.optString("seq");
+
+                    titleList.add(title);
+                    seqList.add(seq);
+                }
+
+                ArrayAdapter arrayAdapter = new ArrayAdapter<String>(notice_prof2.this, android.R.layout.simple_expandable_list_item_1, titleList);
+                listView.setAdapter(arrayAdapter);
+
+                arrayAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params){
+            String server_url = "https://chlwogh0829.cafe24.com/";
+
+            URL url;
+            String response = "";
+
+            try {
+                url = new URL(server_url);
+
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(15000);
+                connection.setRequestMethod("POST");
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                Uri.Builder builder = new Uri.Builder().appendQueryParameter("userid", "");
+                String query = builder.build().getEncodedQuery();
+
+                OutputStream os = connection.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+
+                if (responsecode == HttpURLConnection.HTTP_OK){
+                    String line;
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    while ((line = bufferedReader.readLine()) != null){
+                        response += line;
+                    }
+                }else {
+                    response = "";
+                }
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return response;
+        }
+    }
+}
