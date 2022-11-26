@@ -16,6 +16,8 @@ public class status extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private View drawerview;
     private long backpresstime = 0;
+    
+    ListView mListViewList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +63,18 @@ public class status extends AppCompatActivity {
             }
         });
 
-        TextView lecture_status = findViewById(R.id.lecture_status);
-        lecture_status.setOnClickListener(new View.OnClickListener() {
+        mListViewList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(status.this, statuscheck.class);//출결상황 상세화면으로 이동
-                startActivity(intent);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(view.getContext(), statuscheck.class);
+                HashMap<String,String> map =(HashMap<String,String>)parent.getItemAtPosition(position);
+                String data = map.get(TAG_SUBJECT_NAME);
+                intent.putExtra("lecture", data);
+                startActivity(intent); //출결상황 상세화면으로 이동
+                }
             }
-        });
+        );
 
         drawerLayout.setDrawerListener(listener);
         drawerview.setOnTouchListener(new View.OnTouchListener() {
