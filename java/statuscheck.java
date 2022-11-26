@@ -10,5 +10,9 @@ public class statuscheck extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statuscheck);
+
+        TextView tv = findViewById(R.id.lecture);
+        String lecture = getIntent().getStringExtra("lecture");
+        tv.setText(lecture);
     }
 }
