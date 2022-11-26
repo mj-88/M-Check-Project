@@ -17,7 +17,7 @@ public class status extends AppCompatActivity {
     private View drawerview;
     private long backpresstime = 0;
     
-    private static String TAG = "parquetry";
+    private static String TAG = "select_enrollment";
 
     private static final String TAG_JSON = "select_enrollment";
     private static final String TAG_SUBJECT_ID = "subject_id";
