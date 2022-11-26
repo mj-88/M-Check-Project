@@ -17,7 +17,17 @@ public class status extends AppCompatActivity {
     private View drawerview;
     private long backpresstime = 0;
     
+    private static String TAG = "parquetry";
+
+    private static final String TAG_JSON = "select_enrollment";
+    private static final String TAG_SUBJECT_ID = "subject_id";
+    private static final String TAG_SUBJECT_NAME = "subject_name";
+
+
+    private TextView mTextViewResult;
+    ArrayList<HashMap<String, String>> mArrayList;
     ListView mListViewList;
+    String mJsonString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +127,119 @@ public class status extends AppCompatActivity {
         }
         if(System.currentTimeMillis() <= backpresstime + 2000){
             finish();
+        }
+    }
+    
+
+    private class GetData extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(status.this,
+                    "Please Wait", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            Log.d(TAG, "response - " + result);
+
+            if (result == null) {
+                mTextViewResult.setText(errorString);
+            } else {
+                mJsonString = result;
+                showResult();
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String student_id = params[0];
+
+            String serverURL = "https://chlwogh0829.cafe24.com/select_enrollment_student.php";
+            String postParameters = "student_id=" + student_id;
+
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.connect();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                outputStream.write(postParameters.getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if (responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                } else {
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+                bufferedReader.close();
+                return sb.toString().trim();
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+        }
+    }
+
+    private void showResult() {
+        try {
+            JSONObject jsonObject = new JSONObject(mJsonString);
+            JSONArray jsonArray = jsonObject.getJSONArray(TAG_JSON);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+
+                JSONObject item = jsonArray.getJSONObject(i);
+
+                String subject_id = item.getString(TAG_SUBJECT_ID);
+                String subject_name= item.getString(TAG_SUBJECT_NAME);
+
+                HashMap<String, String> hashMap = new HashMap<>();
+
+                hashMap.put(TAG_SUBJECT_ID, subject_id);
+                hashMap.put(TAG_SUBJECT_NAME, subject_name);
+                mArrayList.add(hashMap);
+
+            }
+            ListAdapter adapter = new SimpleAdapter(
+                    status.this, mArrayList, R.layout.item_list_enrollment,
+                    new String[]{TAG_SUBJECT_ID, TAG_SUBJECT_NAME},
+                    new int[]{R.id.textView_list_Subject_id,R.id.textView_list_Subject_Name}
+            );
+            mListViewList.setAdapter(adapter);
+
+        } catch (JSONException e) {
+            Log.d(TAG, "showResult : ", e);
         }
     }
 }
