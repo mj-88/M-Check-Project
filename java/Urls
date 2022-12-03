@@ -1,0 +1,6 @@
+package com.example.myapplication;
+
+public class Urls {
+    public static final String ROOT_URL = "https://chlwogh0829.cafe24.com/";
+    public static final String RESET_PASSWORD_URL = ROOT_URL+"resetpassword.php";
+}
