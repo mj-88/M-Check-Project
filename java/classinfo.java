@@ -28,7 +28,7 @@ public class classinfo extends AppCompatActivity {
 
     // mysql 접속
     private static String TAG = "test";
-    private static String IP_ADDRESS = "https://chlwogh0829.cafe24.com/";
+    private static String IP_ADDRESS ;
 
     private IntentIntegrator qrScan;
 
@@ -54,6 +54,8 @@ public class classinfo extends AppCompatActivity {
 
 
         lecture = getIntent().getStringExtra("lecture");
+         String subject_id = getIntent().getStringExtra("subject_id");
+        IP_ADDRESS = "https://chlwogh0829.cafe24.com/insert_qr_"+subject_id+".php";
         subject_name.setText(lecture);
 //        task.execute(subject_name.getText().toString());
 
@@ -77,7 +79,7 @@ public class classinfo extends AppCompatActivity {
                 String subject_name = getIntent().getStringExtra("lecture");
 
                 classinfo.InsertData task = new classinfo.InsertData();
-                task.execute(IP_ADDRESS+"insert_qr.php", room, seat, studentId,subject_name);
+                task.execute(IP_ADDRESS, room, seat, studentId,subject_name);
 
                 lecture_place.setText(room);
                 seat_num.setText(seat);
