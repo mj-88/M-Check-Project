@@ -79,8 +79,13 @@ public class status extends AppCompatActivity {
 
                 Intent intent = new Intent(view.getContext(), statuscheck.class);
                 HashMap<String,String> map =(HashMap<String,String>)parent.getItemAtPosition(position);
-                String data = map.get(TAG_SUBJECT_NAME);
+          
+                          String data = map.get(TAG_SUBJECT_NAME);
+                String data2 = map.get(TAG_SUBJECT_ID);
+
                 intent.putExtra("lecture", data);
+                intent.putExtra("subject_id", data2);
+
                 startActivity(intent); //출결상황 상세화면으로 이동
                 }
             }
