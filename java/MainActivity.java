@@ -60,9 +60,13 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(view.getContext(), classinfo.class);
 
                 HashMap<String,String> map =(HashMap<String,String>)parent.getItemAtPosition(position);
-                String data = map.get(TAG_SUBJECT_NAME);
+                   String data = map.get(TAG_SUBJECT_NAME);
 
                 intent.putExtra("lecture", data);
+
+                String data2 = map.get(TAG_SUBJECT_ID);
+
+                intent.putExtra("subject_id", data2);
 
                 startActivity(intent);
             }
