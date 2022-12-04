@@ -34,7 +34,7 @@ import java.util.List;
 //학생 출결상황 상세
 public class statuscheck extends AppCompatActivity {
 
-    private TextView TextViewResult ;
+     private TextView TextViewResult ;
     private TextView TextViewResult2 ;
     private TextView subject_name;
     private ListView mListviewList;
@@ -45,13 +45,15 @@ public class statuscheck extends AppCompatActivity {
     String TAG_TIMETABLE = "timetable";
 
     String TAG_TIME_STAMP  ="time_stamp";
+
+    private String TAG_PHP_URL;
     private String JsonString;
     private String JsonString2;
     private ArrayList<HashMap<String, String>> mArrayList2;
+    private String subject_id;
 
     private ArrayList<HashMap<String, String>> mArrayList;
     private String student_id="60191977";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,8 @@ public class statuscheck extends AppCompatActivity {
         String lecture = getIntent().getStringExtra("lecture");
         tv.setText(lecture);
 
+        subject_id = getIntent().getStringExtra("subject_id");
+        TAG_PHP_URL ="time_stamp_c_" +subject_id +".php";
         subject_name = (TextView) findViewById(R.id.lecture);
 
         mArrayList.clear();
@@ -114,10 +118,9 @@ public class statuscheck extends AppCompatActivity {
         protected String doInBackground(String... params) {
 
 
-              String subject_name = params[0];
-
-            String serverURL = "https://chlwogh0829.cafe24.com/select_lecture.php";
-            String postParameters = "subject_name=" + subject_name;
+             String student_id = params[0];
+            String serverURL = "https://chlwogh0829.cafe24.com/"+TAG_PHP_URL;
+            String postParameters = "student_id=" + student_id;
 
             try {
                 URL url = new URL(serverURL);
