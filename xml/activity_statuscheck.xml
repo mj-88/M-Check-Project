@@ -66,115 +66,49 @@
         android:background="#00BCD4"
         android:orientation="horizontal">
 
+
         <TextView
-            android:layout_width="100dp"
+            android:layout_width="111dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:text="주차"
-            android:layout_gravity="center"
-            android:gravity="center"
             android:textColor="#ffffff"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
         <TextView
-            android:layout_width="200dp"
+            android:layout_width="281dp"
             android:layout_height="wrap_content"
-            android:text="출석시간"
             android:layout_gravity="center"
             android:gravity="center"
+            android:text="출석 시간(~15분 이내)"
             android:textColor="#ffffff"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="출결"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
 
 
     </LinearLayout>
 
 
-    <LinearLayout
+    <ListView
+        android:id="@+id/listView_statuscheck_list"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="주차"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="출석시간"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:text="출석"
-            android:background="#4CAF50"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="18sp"/>
-
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="#000000"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="주차"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="출석시간"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:text="결석"
-            android:background="#E91E63"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="18sp"/>
-
-    </LinearLayout>
+        android:layout_height="361dp"
+        android:layout_weight="0.4"
+        android:text="list" />
 
     <TextView
         android:id="@+id/textView_main_result"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.4" />
+    <TextView
+    android:id="@+id/textView_main_result2"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="0.4" />
+    <TextView
+        android:id="@+id/textView_main_result3"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.4" />
